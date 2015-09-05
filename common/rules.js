@@ -13,16 +13,17 @@
 
  */
 
-var FPS = 24;
+var FPS = 10;
 
 var r = function(){
     var rules = {
-        "fps": 1000 / 30,
+        "fps": 1000 / FPS,
+        "smoothing": 10,
         "player":{
-            "scaleValue": 1200,
-            "speed": 6,
+            "scaleValue": 700,
+            "speed": 500/FPS,
             "inertia": 20,
-            "turningSpeed": 30
+            "turningSpeed": 700/FPS
         },
         "screen":{
             "width": window.innerWidth,

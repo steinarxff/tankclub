@@ -37,12 +37,22 @@ var player = function () {
         maxSpeed = r("player.speed"),
         inertia = r("player.inertia"),
         turningSpeed = r("player.turningSpeed")/(Math.pow(inertia, 2)),
-        element = false;
+        smoothing = r("smoothing"),
+        element = false,
+        target = {
+            x: 0,
+            y: 0,
+            rotation: 0
+        };
 
     return {
 
         setElement: function(k){
+            k.handler = this;
             element = k;
+            target.x = k.position.x;
+            target.y = k.position.y;
+            target.rotation = k.rotation;
         },
 
         handle: function (k) {
@@ -90,16 +100,21 @@ var player = function () {
 
 
             if(turning == 1){
-                rotation-=turningSpeed;
+                target.rotation-=turningSpeed;
             }else if(turning == -1){
-                rotation+=turningSpeed;
+                target.rotation+=turningSpeed;
             }
         },
 
+        nudge: function(){
+            element.rotation += (target.rotation - element.rotation)/smoothing;
+            element.position.x += (target.x - element.position.x)/smoothing;
+            element.position.y += (target.y - element.position.y)/smoothing;
+        },
+
         update: function(){
-            element.position.x = element.position.x + (speed * Math.cos(element.rotation));
-            element.position.y = element.position.y + (speed * Math.sin(element.rotation));
-            element.rotation = rotation;
+            target.x = element.position.x + (speed * Math.cos(element.rotation));
+            target.y = element.position.y + (speed * Math.sin(element.rotation));
         }
     }
 }();
