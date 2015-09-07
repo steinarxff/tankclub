@@ -13,17 +13,31 @@
 
  */
 
-var FPS = 10;
+var FPS = 30;
 
 var r = function(){
     var rules = {
         "fps": 1000 / FPS,
         "smoothing": 10,
+        "base": {
+            "weight": 100,
+            "engine": 100,
+            "maxSpeed": 100,
+            "turningSpeed": 100
+        },
         "player":{
-            "scaleValue": 700,
-            "speed": 500/FPS,
-            "inertia": 20,
-            "turningSpeed": 700/FPS
+            "weight": 100,
+            "engine": 100,
+            "maxSpeed": 100,
+            "turningSpeed": 100,
+            "scaleValue":   800
+        },
+        "player":{
+            "weight": 100,
+            "engine": 100,
+            "maxSpeed": 80,
+            "turningSpeed": 200,
+            "scaleValue":   800
         },
         "screen":{
             "width": window.innerWidth,

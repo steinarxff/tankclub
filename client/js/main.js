@@ -1,3 +1,6 @@
+
+
+
 var dispatch = function(){
     var listeners = [];
     return {
@@ -34,9 +37,30 @@ var player = function () {
         turning = 0,
         rotation = 0,
         speed = 0,
-        maxSpeed = r("player.speed"),
-        inertia = r("player.inertia"),
-        turningSpeed = r("player.turningSpeed")/(Math.pow(inertia, 2)),
+
+        weight = r("player.weight"),
+        baseWeight = r("base.weight"),
+        weightRatio = weight / baseWeight,
+
+        engine = r("player.engine"),
+        baseEngine = r("base.engine"),
+        engineRatio = engine / baseEngine,
+
+        maxSpeed = r("player.maxSpeed"),
+        baseMaxSpeed = r("base.maxSpeed"),
+        maxSpeedRatio = maxSpeed / baseMaxSpeed,
+
+        turningSpeed = r("player.turningSpeed"),
+        baseTurningSpeed = r("base.turningSpeed"),
+        turningSpeedRatio = turningSpeed / baseTurningSpeed,
+
+        //enginePower = r("player.enginePower"),
+        //ratio = enginePower / weight,
+        //ratio = ratio * ratio,
+        //maxSpeed = r("baseSpeed") + (r("baseSpeed") * Math.pow(ratio,2)),
+        //acceleration = ratio*en..ginePower  / FPS,
+        //accelaration = ()/();
+        //turningSpeed = Math.pow((1+ratio),5) / FPS,
         smoothing = r("smoothing"),
         element = false,
         target = {
@@ -85,24 +109,44 @@ var player = function () {
         calc: function(){
             if(accelerating == 1){
                 // moving forward
-                if(speed < maxSpeed)
-                    speed = speed + (maxSpeed - speed)/inertia;
-                else if(speed >= maxSpeed){
+                if(speed < maxSpeed) {
+                    // accelerating
+                    //speed += ((acceleration*(1+ratio)) + ((maxSpeed-speed))/FPS);
+                    speed += ((maxSpeed - speed)/FPS) * engineRatio;
+                }else if(speed >= maxSpeed){
+                    // at top speed
                     speed = maxSpeed;
                 }
             }else if(accelerating == 0){
-                if(speed > 0)
-                    speed = speed - (speed)/(inertia/2);
-                else if(speed <= 0){
-                    speed = 0;
+                // no acceleration
+                var t;
+                if(speed > 0) {
+                    t = 1;
+                    // speed is positive
+                    speed = speed - ((speed/FPS)*weightRatio * 2 * weightRatio);
+                }else if(speed < 0){
+                    // speed is negative;
+                    t = -1;
+                    speed = speed + ((Math.abs(speed)/FPS)*weightRatio * 2 * weightRatio);
+                }
+
+                // shifted from positibe to negative speed or vice versa
+                if(speed > 0 && t == -1 || speed < 0 && t == 1){
+                   speed = 0;
+                }
+            }else if(accelerating == -1){
+                if(speed > -maxSpeed) {
+                    speed -= ((maxSpeed-Math.abs(speed))/FPS)*weightRatio * 2 * maxSpeedRatio;
+                }else if(speed <= -maxSpeed) {
+                    speed = -maxSpeed
                 }
             }
 
 
             if(turning == 1){
-                target.rotation-=turningSpeed;
+                target.rotation -= turningSpeedRatio / FPS;
             }else if(turning == -1){
-                target.rotation+=turningSpeed;
+                target.rotation += turningSpeedRatio / FPS;
             }
         },
 
